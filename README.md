@@ -36,7 +36,7 @@ _rewrite this_
 
 * Publish messages to the configured subjects (e.g. `todo.now`) via NATS CLI
 * manually: `nats pub todos.next "draft launch blog"
-* via script, e.g shell script [launched with Raycast]([url](https://github.com/raycast/script-commands))
+* via script, e.g [shell script](raycast/now.sh) [launched with Raycast](https://github.com/raycast/script-commands)
   
 ## Websockets
 
