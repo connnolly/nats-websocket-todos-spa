@@ -1,6 +1,6 @@
 # Single-Page TODO List App with NATS over WebSockets
 
-Overview of a websocket-based TODO List application that uses [NATS](https://nats.io/) for real-time communication and task management.  
+A single-page application designed to introduce and demonstrate key concepts of NATS to developers new to NATS and Synadia Cloud. This app showcases how to leverage NATS for real-time communication, message publishing, and subscription handling within a simple but practical/concrete application.
 
 ## Features
 _rewrite this_
@@ -32,6 +32,12 @@ _rewrite this_
 
 * Any modern browser should be able to open the file and connect
 
+### Add TODOs
+
+* Publish messages to the configured subjects (e.g. `todo.now`) via NATS CLI
+* manually: `nats pub todos.next "draft launch blog"
+* via script, e.g shell script [launched with Raycast]([url](https://github.com/raycast/script-commands))
+  
 ## Websockets
 
 ### Connecting to Synadia Cloud's global NATS server 
