@@ -60,7 +60,7 @@ const nc \= await connect({
   
 ## Dependencies
 
-* [NATS.js WebSocket Client](https://cdn.jsdelivr.net/npm/nats.ws@1.10.0/esm/nats.js): For simple real-time communication
+* [NATS.js WebSocket Client](https://github.com/nats-io/nats.js): For simple real-time communication
 * [Synadia Cloud](https://synadia.com/cloud): A hosted global NATS server. The app can be configured to work with any NATS server  
  
 ## Future Enhancements
