@@ -3,18 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Andrew's TODO List</title>
+  <title>TODO List</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Inter, sans-serif;
     }
-    #todo-list {
+    .todo-section {
+      margin-bottom: 20px;
+    }
+    ul {
       list-style-type: none;
       padding: 0;
     }
-    #todo-list li {
+    li {
+      display: flex;
+      align-items: center;
       padding: 8px 12px;
       border-bottom: 1px solid #ccc;
+      font-size: 36px;
+      color: royalblue;
+    }
+    li.done {
+      text-decoration: line-through;
+      color: grey;
+    }
+    input[type="checkbox"] {
+      margin-right: 12px;
+      transform: scale(1.5);
     }
   </style>
   <script defer type="module">
@@ -25,38 +40,73 @@
     } from "https://cdn.jsdelivr.net/npm/nats.ws@1.10.0/esm/nats.js";
 
     const sc = new StringCodec();
-
+    <!-- paste jwt from Synadia Cloud creds file here -->
     const creds = ``;
 
-    (async () => {
+    const initializeTodoSection = async (subject, containerId) => {
       try {
         const nc = await connect({
           servers: ["wss://connect.ngs.global"],
           authenticator: credsAuthenticator(new TextEncoder().encode(creds)),
         });
 
-        const sub = nc.subscribe("todos.list");
-        const todoList = document.getElementById("todo-list");
+        const sub = nc.subscribe(subject);
+        const todoList = document.getElementById(containerId);
 
         for await (const msg of sub) {
           const todo = sc.decode(msg.data);
-          console.log(`Received a to-do: ${todo}`);
-
-          // Create a new list item for each received to-do
           const li = document.createElement("li");
-          li.textContent = todo;
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+
+          checkbox.addEventListener("change", async () => {
+            if (checkbox.checked) {
+              li.classList.add("done");
+              const doneMessage = JSON.stringify({
+                todo,
+                timestamp: new Date().toISOString(),
+                subject
+              });
+              await nc.publish(`${subject}.done`, sc.encode(doneMessage));
+              console.log(`Published 'done' message for: ${todo}`);
+
+              // Remove to-do from UI after 8 hours
+              setTimeout(() => li.remove(), 8 * 60 * 60 * 1000);
+            }
+          });
+
+          li.appendChild(checkbox);
+          li.appendChild(document.createTextNode(todo.replace(/['"]+/g, '')));
           todoList.appendChild(li);
         }
       } catch (error) {
-        console.error("Failed to connect to NATS:", error);
+        console.error(`Failed to connect to NATS for ${subject}:`, error);
       }
-    })();
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeTodoSection("todos.now", "now-todos");
+      initializeTodoSection("todos.next", "next-todos");
+      initializeTodoSection("todos.later", "later-todos");
+    });
   </script>
 </head>
 <body>
-  <h1>Andrew's TODO List</h1>
-  <ul id="todo-list">
-    <!-- To-do items will be appended here -->
-  </ul>
+  <h1>TODO List</h1>
+
+  <div class="todo-section">
+    <h2>NOW</h2>
+    <ul id="now-todos"></ul>
+  </div>
+
+  <div class="todo-section">
+    <h2>NEXT</h2>
+    <ul id="next-todos"></ul>
+  </div>
+
+  <div class="todo-section">
+    <h2>LATER</h2>
+    <ul id="later-todos"></ul>
+  </div>
 </body>
 </html>
