@@ -3,19 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <title>TODO List</title>
+  
   <style>
     body {
       font-family: Inter, sans-serif;
     }
     .todo-section {
+      /* Adds margin below each section */
       margin-bottom: 20px;
     }
     ul {
+      /* Removes default list styles and padding */
       list-style-type: none;
       padding: 0;
     }
     li {
+      /* Styles individual list items */
       display: flex;
       align-items: center;
       padding: 8px 12px;
@@ -24,44 +29,59 @@
       color: royalblue;
     }
     li.done {
+      /* Styles completed items with strikethrough and grey color */
       text-decoration: line-through;
       color: grey;
     }
     input[type="checkbox"] {
+      /* Styles the checkboxes */
       margin-right: 12px;
       transform: scale(1.5);
     }
   </style>
+
+  <!-- JavaScript for dynamically fetching and updating TODO items -->
   <script defer type="module">
+    // Import required modules from NATS.js library
     import {
       connect,
       StringCodec,
       credsAuthenticator,
     } from "https://cdn.jsdelivr.net/npm/nats.ws@1.10.0/esm/nats.js";
 
+    // Initialize a string codec for encoding/decoding messages
     const sc = new StringCodec();
-    <!-- paste jwt from Synadia Cloud creds file here -->
+
+    <!-- Placeholder for credentials from Synadia Cloud -->
     const creds = ``;
 
+    // Function to initialize a TODO section
     const initializeTodoSection = async (subject, containerId) => {
       try {
+        // Establishes a connection to the NATS server
         const nc = await connect({
           servers: ["wss://connect.ngs.global"],
           authenticator: credsAuthenticator(new TextEncoder().encode(creds)),
         });
 
+        // Subscribes to a subject (e.g., "todos.now")
         const sub = nc.subscribe(subject);
         const todoList = document.getElementById(containerId);
 
+        // Processes each incoming message for the subscribed subject
         for await (const msg of sub) {
-          const todo = sc.decode(msg.data);
+          const todo = sc.decode(msg.data); // Decodes the TODO message
           const li = document.createElement("li");
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
 
+          // Event listener for checkbox changes
           checkbox.addEventListener("change", async () => {
             if (checkbox.checked) {
+              // Marks the item as done
               li.classList.add("done");
+
+              // Prepares and publishes a 'done' message to a new subject
               const doneMessage = JSON.stringify({
                 todo,
                 timestamp: new Date().toISOString(),
@@ -70,28 +90,33 @@
               await nc.publish(`${subject}.done`, sc.encode(doneMessage));
               console.log(`Published 'done' message for: ${todo}`);
 
-              // Remove to-do from UI after 8 hours
+              // Removes the TODO item from UI after 8 hours
               setTimeout(() => li.remove(), 8 * 60 * 60 * 1000);
             }
           });
 
+          // Appends checkbox and text content to the list item
           li.appendChild(checkbox);
           li.appendChild(document.createTextNode(todo.replace(/['"]+/g, '')));
-          todoList.appendChild(li);
+          todoList.appendChild(li); // Adds the item to the TODO list
         }
       } catch (error) {
+        // Handles connection or subscription errors
         console.error(`Failed to connect to NATS for ${subject}:`, error);
       }
     };
 
+    // Event listener to initialize TODO sections after the DOM is fully loaded
+    // TODO: refactor so all susbscriptions use same connection?
     document.addEventListener("DOMContentLoaded", () => {
-      initializeTodoSection("todos.now", "now-todos");
-      initializeTodoSection("todos.next", "next-todos");
-      initializeTodoSection("todos.later", "later-todos");
+      initializeTodoSection("todos.now", "now-todos"); // NOW section
+      initializeTodoSection("todos.next", "next-todos"); // NEXT section
+      initializeTodoSection("todos.later", "later-todos"); // LATER section
     });
   </script>
 </head>
 <body>
+  <!-- Main heading of the TODO application -->
   <h1>TODO List</h1>
 
   <div class="todo-section">
