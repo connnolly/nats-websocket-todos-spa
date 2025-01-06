@@ -1,6 +1,6 @@
 # Single-Page TODO List App with NATS over WebSockets
 
-A single-page application designed to introduce and demonstrate key concepts of NATS to developers new to NATS and Synadia Cloud. This app showcases how to leverage NATS for real-time communication, message publishing, and subscription handling within a simple but practical/concrete application.
+A single-page application designed to introduce and demonstrate basic NATS concepts to developers new to NATS and Synadia Cloud. This app showcases how to leverage NATS for real-time communication, message publishing, and subscription handling within a simple but practical/concrete application.
 
 ## Features
 _rewrite this_
