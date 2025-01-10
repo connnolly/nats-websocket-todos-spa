@@ -2,6 +2,10 @@
 
 A single-page application designed to introduce and demonstrate basic NATS concepts to developers new to NATS and Synadia Cloud. This app showcases how to leverage NATS for real-time communication, message publishing, and subscription handling within a simple but practical/concrete application.
 
+## Architecture
+
+![CleanShot 2025-01-10 at 13 19 38](https://github.com/user-attachments/assets/7c6f7625-799b-43ad-9133-970393198449)
+
 ## Features
 _rewrite this_
 * Real-time TODO list management with NATS WebSocket protocol and Synadia Cloud
