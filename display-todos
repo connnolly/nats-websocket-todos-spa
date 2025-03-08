@@ -52,7 +52,6 @@
     // Initialize a string codec for encoding/decoding messages
     const sc = new StringCodec();
 
-    <!-- Placeholder for credentials from Synadia Cloud -->
     const creds = ``;
 
     // Function to initialize a TODO section
